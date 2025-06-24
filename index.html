@@ -5,52 +5,141 @@
   <title>Motivation Responsibility Spider Chart</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    label { display: block; margin: 8px 0 2px; }
-    input[type="number"] { width: 50px; }
-    #chartContainer { max-width: 600px; margin: 30px auto; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    p {
+      text-align: center;
+      color: #555;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #444;
+    }
+
+    input[type="number"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 80px;
+      font-size: 1em;
+    }
+
+    button {
+      background: #007acc;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #005fa3;
+    }
+
+    #chartContainer {
+      margin-top: 30px;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .input-row label {
+      flex: 1 1 60%;
+    }
+
+    .input-row input {
+      flex: 0 1 80px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Who is Responsible for Motivation?</h2>
-  <p>Rate from 1 (Not responsible) to 5 (Highly responsible):</p>
+  <div class="container">
+    <h2>Who is Responsible for Motivation?</h2>
+    <p>Rate from 1 (Not responsible) to 5 (Highly responsible):</p>
 
-  <form id="motivationForm">
-    <label>Self (Personal Drive):
-      <input type="number" name="Self" min="1" max="5" required>
-    </label>
+    <form id="motivationForm">
+      <div class="input-row">
+        <label>Self (Personal Drive):</label>
+        <input type="number" name="Self" min="1" max="5" required>
+      </div>
 
-    <label>Manager/Supervisor:
-      <input type="number" name="Manager" min="1" max="5" required>
-    </label>
+      <div class="input-row">
+        <label>Manager / Supervisor:</label>
+        <input type="number" name="Manager" min="1" max="5" required>
+      </div>
 
-    <label>Team/Peers:
-      <input type="number" name="Team" min="1" max="5" required>
-    </label>
+      <div class="input-row">
+        <label>Team / Peers:</label>
+        <input type="number" name="Team" min="1" max="5" required>
+      </div>
 
-    <label>Company Culture / Environment:
-      <input type="number" name="Culture" min="1" max="5" required>
-    </label>
+      <div class="input-row">
+        <label>Company Culture / Environment:</label>
+        <input type="number" name="Culture" min="1" max="5" required>
+      </div>
 
-    <label>Leadership:
-      <input type="number" name="Leadership" min="1" max="5" required>
-    </label>
+      <div class="input-row">
+        <label>Leadership:</label>
+        <input type="number" name="Leadership" min="1" max="5" required>
+      </div>
 
-    <label>Rewards & Recognition System:
-      <input type="number" name="Rewards" min="1" max="5" required>
-    </label>
+      <div class="input-row">
+        <label>Rewards & Recognition System:</label>
+        <input type="number" name="Rewards" min="1" max="5" required>
+      </div>
 
-    <label>Work Design:
-      <input type="number" name="WorkDesign" min="1" max="5" required>
-    </label>
+      <div class="input-row">
+        <label>Work Design:</label>
+        <input type="number" name="WorkDesign" min="1" max="5" required>
+      </div>
 
-    <br>
-    <button type="submit">Generate Spider Chart</button>
-  </form>
+      <button type="submit">Generate Spider Chart</button>
+    </form>
 
-  <div id="chartContainer">
-    <canvas id="spiderChart"></canvas>
+    <div id="chartContainer">
+      <canvas id="spiderChart"></canvas>
+    </div>
   </div>
 
   <script>
@@ -64,8 +153,8 @@
       const formData = new FormData(form);
       const labels = [
         'Self (Personal Drive)',
-        'Manager/Supervisor',
-        'Team/Peers',
+        'Manager / Supervisor',
+        'Team / Peers',
         'Company Culture / Environment',
         'Leadership',
         'Rewards & Recognition System',
@@ -91,9 +180,12 @@
             label: 'Motivation Responsibility',
             data: data,
             fill: true,
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+            backgroundColor: 'rgba(0, 122, 204, 0.2)',
+            borderColor: 'rgba(0, 122, 204, 1)',
+            pointBackgroundColor: 'rgba(0, 122, 204, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(0, 122, 204, 1)'
           }]
         },
         options: {
@@ -102,8 +194,24 @@
               min: 1,
               max: 5,
               ticks: {
-                stepSize: 1
+                stepSize: 1,
+                backdropColor: 'transparent',
+                color: '#333'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              },
+              pointLabels: {
+                color: '#333',
+                font: {
+                  size: 12
+                }
               }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
             }
           }
         }
