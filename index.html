@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Motivation Responsibility Spider Chart</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -90,11 +92,30 @@
     .input-row input {
       flex: 0 1 80px;
     }
+
+    #interpretation {
+      background: #e8f4fc;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      color: #004b73;
+      font-size: 1em;
+    }
+
+    #exportBtn {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      background: #28a745;
+    }
+
+    #exportBtn:hover {
+      background: #218838;
+    }
   </style>
 </head>
 <body>
-
-  <div class="container">
+  <div class="container" id="reportContent">
     <h2>Who is Responsible for Motivation?</h2>
     <p>Rate from 1 (Not responsible) to 5 (Highly responsible):</p>
 
@@ -103,51 +124,96 @@
         <label>Self (Personal Drive):</label>
         <input type="number" name="Self" min="1" max="5" required>
       </div>
-
       <div class="input-row">
         <label>Manager / Supervisor:</label>
         <input type="number" name="Manager" min="1" max="5" required>
       </div>
-
       <div class="input-row">
         <label>Team / Peers:</label>
         <input type="number" name="Team" min="1" max="5" required>
       </div>
-
       <div class="input-row">
         <label>Company Culture / Environment:</label>
         <input type="number" name="Culture" min="1" max="5" required>
       </div>
-
       <div class="input-row">
         <label>Leadership:</label>
         <input type="number" name="Leadership" min="1" max="5" required>
       </div>
-
       <div class="input-row">
         <label>Rewards & Recognition System:</label>
         <input type="number" name="Rewards" min="1" max="5" required>
       </div>
-
       <div class="input-row">
         <label>Work Design:</label>
         <input type="number" name="WorkDesign" min="1" max="5" required>
       </div>
-
       <button type="submit">Generate Spider Chart</button>
     </form>
 
     <div id="chartContainer">
       <canvas id="spiderChart"></canvas>
     </div>
+
+    <div id="interpretation"></div>
+
+    <button id="exportBtn">Export to PDF</button>
   </div>
 
   <script>
     const form = document.getElementById('motivationForm');
     const ctx = document.getElementById('spiderChart').getContext('2d');
+    const interpDiv = document.getElementById('interpretation');
+    const exportBtn = document.getElementById('exportBtn');
     let radarChart;
 
-    form.addEventListener('submit', function(e) {
+    async function fetchInterpretation(data, labels) {
+      try {
+        const response = await fetch('http://localhost:3000/api/interpret', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            scores: data.reduce((acc, score, idx) => {
+              acc[labels[idx]] = score;
+              return acc;
+            }, {}),
+            prompt: `You are an expert in workplace motivation. Analyze the following scores (1 = Not responsible, 5 = Highly responsible) for factors contributing to motivation. Provide a detailed interpretation (150-200 words), highlighting strengths, weaknesses, and key insights. Suggest two actionable steps to improve motivation based on the scores. Format the response in HTML with <strong> for emphasis, <br> for line breaks, and <ul><li> for actionable steps.`
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch interpretation');
+        }
+
+        const result = await response.json();
+        return result.interpretation || 'No interpretation received from API.';
+      } catch (error) {
+        console.error('Error fetching interpretation:', error);
+        // Fallback interpretation
+        const maxScore = Math.max(...data);
+        const minScore = Math.min(...data);
+        const range = maxScore - minScore;
+        const maxFactors = labels.filter((_, idx) => data[idx] === maxScore);
+        const minFactors = labels.filter((_, idx) => data[idx] === minScore);
+
+        let interpText = `<strong>Top responsible factor(s):</strong> ${maxFactors.join(', ')} (score: ${maxScore})<br>`;
+        interpText += `<strong>Least responsible factor(s):</strong> ${minFactors.join(', ')} (score: ${minScore})<br>`;
+        
+        if (range <= 1) {
+          interpText += `Your ratings are balanced, indicating shared responsibility across dimensions.`;
+        } else {
+          interpText += `There's a noticeable gap (range: ${range}). This suggests some areas may be overlooked.<br>`;
+          minFactors.forEach(factor => {
+            interpText += `✅ Consider reflecting on <em>${factor}</em> — could this area play a bigger role in motivating you?<br>`;
+          });
+        }
+        return interpText;
+      }
+    }
+
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const formData = new FormData(form);
@@ -216,8 +282,24 @@
           }
         }
       });
+
+      // Fetch interpretation from API or fallback
+      const interpretation = await fetchInterpretation(data, labels);
+      interpDiv.innerHTML = interpretation;
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const report = document.getElementById('reportContent');
+      html2canvas(report).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save('MotivationSpiderChart.pdf');
+      });
     });
   </script>
-
 </body>
 </html>
