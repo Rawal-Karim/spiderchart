@@ -145,7 +145,7 @@
         <input type="number" name="Rewards" min="1" max="5" required>
       </div>
       <div class="input-row">
-        <label>Work Design:</label>
+        <label>Job Design & Autonomy:</label>
         <input type="number" name="WorkDesign" min="1" max="5" required>
       </div>
       <button type="submit">Generate Spider Chart</button>
@@ -224,7 +224,7 @@
         'Company Culture / Environment',
         'Leadership',
         'Rewards & Recognition System',
-        'Work Design'
+        'Job Design & Autonomy'
       ];
       const data = [
         parseInt(formData.get('Self')),
@@ -233,7 +233,7 @@
         parseInt(formData.get('Culture')),
         parseInt(formData.get('Leadership')),
         parseInt(formData.get('Rewards')),
-        parseInt(formData.get('WorkDesign'))
+        parseInt(formData.get('Job Design & Autonomy'))
       ];
 
       if (radarChart) radarChart.destroy();
