@@ -116,7 +116,7 @@
 </head>
 <body>
   <div class="container" id="reportContent">
-    <h2>Who is Responsible for Motivation?</h2>
+    <h2>Who is Responsible for your Motivation?</h2>
     <p>Rate from 1 (Not responsible) to 5 (Highly responsible):</p>
 
     <form id="motivationForm">
@@ -145,7 +145,7 @@
         <input type="number" name="Rewards" min="1" max="5" required>
       </div>
       <div class="input-row">
-        <label>Job Design & Autonomy:</label>
+        <label>Work Design & Autonomy:</label>
         <input type="number" name="Job Design & Autonomy" min="1" max="5" required>
       </div>
       <button type="submit">Generate Spider Chart</button>
@@ -224,7 +224,7 @@
         'Company Culture / Environment',
         'Leadership',
         'Rewards & Recognition System',
-        'Job Design & Autonomy'
+        'Work Design & Autonomy'
       ];
       const data = [
         parseInt(formData.get('Self')),
@@ -233,7 +233,7 @@
         parseInt(formData.get('Culture')),
         parseInt(formData.get('Leadership')),
         parseInt(formData.get('Rewards')),
-        parseInt(formData.get('Job Design & Autonomy'))
+        parseInt(formData.get('Work Design & Autonomy'))
       ];
 
       if (radarChart) radarChart.destroy();
